@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from '@google/genai';
-import type { Wallpaper } from '../types';
+import type { Wallpaper, AspectRatio } from '../types';
 
 // Initialize the Gemini AI client
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -26,14 +26,19 @@ const responseSchema = {
 /**
  * Searches for wallpapers using the Gemini API.
  * @param query The user's search query.
+ * @param aspectRatio The desired aspect ratio for the wallpapers.
  * @param count The number of wallpapers to request.
  * @returns A promise that resolves to an array of Wallpaper objects.
  */
-export const searchWallpapers = async (query: string, count: number = 20): Promise<Wallpaper[]> => {
+export const searchWallpapers = async (query: string, aspectRatio: AspectRatio = '16:9', count: number = 20): Promise<Wallpaper[]> => {
+  const aspectRatioPrompt = aspectRatio !== 'any' ? ` with a ${aspectRatio} aspect ratio` : '';
+
   // Construct a detailed prompt for the Gemini model
-  const prompt = `Find ${count} high-quality, widescreen (16:9 aspect ratio) wallpapers related to "${query}". 
-  The wallpapers should be safe for work. 
+  const prompt = `Find ${count} wallpapers related to "${query}"${aspectRatioPrompt}. 
+  Prioritize images of the highest possible resolution, suitable for desktop backgrounds (e.g., 4K, 1920x1080).
+  The wallpapers should be high-quality and safe for work. 
   For each wallpaper, provide a unique ID, relevant tags, and URLs for the full-resolution file, a sample-size image, and a small preview thumbnail. 
+  It is crucial that the 'fileUrl' links to the original, uncompressed, highest-resolution version of the image available.
   If you can only find one URL, use it for all three URL fields (fileUrl, sampleUrl, previewUrl). 
   Ensure the URLs are direct links to an image file (e.g., ending in .jpg, .png).`;
 

@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { PRESET_TAGS } from '../constants';
+import { PRESET_TAGS, ASPECT_RATIOS } from '../constants';
+import type { AspectRatio } from '../types';
 
 interface HeaderProps {
   onSearch: (query: string) => void;
   isLoading: boolean;
+  aspectRatio: AspectRatio;
+  onAspectRatioChange: (ratio: AspectRatio) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onSearch, isLoading }) => {
+export const Header: React.FC<HeaderProps> = ({ onSearch, isLoading, aspectRatio, onAspectRatioChange }) => {
   const [query, setQuery] = useState('');
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -56,6 +59,25 @@ export const Header: React.FC<HeaderProps> = ({ onSearch, isLoading }) => {
           </button>
         ))}
       </div>
+
+      <div className="flex items-center justify-center flex-wrap gap-2 mt-4 pt-2 border-t border-slate-800">
+        <span className="text-sm text-slate-400 mr-2">Aspect Ratio:</span>
+        {ASPECT_RATIOS.map(ratio => (
+          <button
+            key={ratio}
+            onClick={() => onAspectRatioChange(ratio)}
+            disabled={isLoading}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+              aspectRatio === ratio
+                ? 'bg-cyan-600 text-white'
+                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+            }`}
+          >
+            {ratio}
+          </button>
+        ))}
+      </div>
+
     </div>
   );
 };

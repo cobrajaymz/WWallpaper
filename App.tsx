@@ -3,7 +3,7 @@ import { WallpaperGrid } from './components/WallpaperGrid';
 import { PreviewModal } from './components/PreviewModal';
 import { Header } from './components/Header';
 import { searchWallpapers } from './services/geminiService';
-import type { Wallpaper } from './types';
+import type { Wallpaper, AspectRatio } from './types';
 import { WelcomeScreen } from './components/WelcomeScreen';
 
 const App: React.FC = () => {
@@ -12,6 +12,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedWallpaper, setSelectedWallpaper] = useState<Wallpaper | null>(null);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('16:9');
 
   const handleSearch = useCallback(async (query: string) => {
     if (!query) return;
@@ -22,7 +23,7 @@ const App: React.FC = () => {
     setHasSearched(true);
 
     try {
-      const newWallpapers = await searchWallpapers(query);
+      const newWallpapers = await searchWallpapers(query, aspectRatio);
       if (newWallpapers.length === 0) {
         setError(`No wallpapers found for "${query}". Please try another search.`);
       } else {
@@ -34,7 +35,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [aspectRatio]);
 
   const handleSelectWallpaper = (wallpaper: Wallpaper) => {
     setSelectedWallpaper(wallpaper);
@@ -56,7 +57,12 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-900 text-gray-100 flex flex-col">
       <header className="p-4 md:p-8 sticky top-0 bg-slate-900/80 backdrop-blur-sm z-10">
-        <Header onSearch={handleSearch} isLoading={isLoading} />
+        <Header 
+          onSearch={handleSearch} 
+          isLoading={isLoading}
+          aspectRatio={aspectRatio}
+          onAspectRatioChange={setAspectRatio}
+        />
       </header>
       
       <main className="flex-1 p-4 md:px-8 md:pb-8">
